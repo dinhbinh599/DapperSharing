@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using DapperSharing.Examples;
 using DapperSharing.Models;
 using DapperSharing.Utils;
 using Microsoft.Data.SqlClient;
@@ -8,27 +9,51 @@ namespace DapperSharing
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-            IEnumerable<ProductEntity> results;
-
-            using (var connection = new SqlConnection(DBInfo.ConnectionString))
+            while (true)
             {
-                var sql = @"
-SELECT * FROM production.products
-ORDER BY product_id
-OFFSET 0 ROWS
-FETCH NEXT 5 ROWS ONLY";
-
-                results = connection.Query<ProductEntity>(sql);
+                Console.WriteLine("=========== GETTING STARTED ===========");
+                var userInput = Console.ReadLine();
+                switch (userInput)
+                {
+                    case "1":
+                        E01_QuickStart.Run();
+                        break;
+                    case "2":
+                        await E02_QueryData.Run();
+                        break;
+                    case "3":
+                        await E03_MappingConfig.Run();
+                        break;
+                    case "4":
+                        await E04_ExecuteCommand.Run();
+                        break;
+                    case "5":
+                        await E05_ExecuteReader.Run();
+                        break;
+                    case "6":
+                        await E06_Relationships.Run();
+                        break;
+                    case "7":
+                        await E07_Parameters.Run();
+                        break;
+                    case "8":
+                        await E08_Others.Run();
+                        break;
+                    case "9":
+                        await E09_Extensions.Run();
+                        break;
+                    case "end":
+                        return;
+                }
             }
-            DisplayHelper.PrintJson(results);
         }
 
-        static partial class DBInfo
+        internal static partial class DBInfo
         {
-            public const string ConnectionString = "Server=TUANPHAM;Database=BikeStores;Trusted_Connection=True;Encrypt=False";
+            public const string ConnectionString = "Server=DESKTOP-RESKER;Database=BikeStores;Trusted_Connection=True;Encrypt=False";
+            public const string ConnectionStringError = "Server=123;Database=BikeStores;Trusted_Connection=True;Encrypt=False";
         }
     }
 }
