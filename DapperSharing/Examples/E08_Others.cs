@@ -37,7 +37,7 @@ namespace DapperSharing.Examples
 
             try
             {
-                var sql = @$"DELETE FROM production.products WHERE product_name = @Name";
+                var sql = @$"DELETE FROM production.products WHERE ProductName = @Name";
 
                 await connection.ExecuteAsync(sql, new
                 {
@@ -69,7 +69,7 @@ namespace DapperSharing.Examples
 
             try
             {
-                var sql = @$"DELETE FROM production.products WHERE product_name = @Name";
+                var sql = @$"DELETE FROM production.products WHERE ProductName = @Name";
 
                 await connection.ExecuteAsync(sql, new
                 {

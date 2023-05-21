@@ -23,10 +23,10 @@ namespace DapperSharing.Examples
         {
             var builder = new SqlBuilder()
                 .Select("p.*")
-                .OrderBy("p.model_year DESC, p.product_name ASC");
+                .OrderBy("p.model_year DESC, p.ProductName ASC");
             var types = new List<Type>
             {
-                typeof(ProductEntity)
+                typeof(Product)
             };
             var splitOns = new List<string>();
 
@@ -41,7 +41,7 @@ namespace DapperSharing.Examples
 
             if (!string.IsNullOrWhiteSpace(search))
             {
-                builder.Where("p.product_name LIKE @Search", new
+                builder.Where("p.ProductName LIKE @Search", new
                 {
                     Search = $"%{search}%"
                 });
@@ -56,7 +56,7 @@ namespace DapperSharing.Examples
                         CategorySearch = $"%{category}%"
                     });
 
-                types.Add(typeof(CategoryEntity));
+                types.Add(typeof(Category));
                 splitOns.Add("category_id");
             }
 
@@ -76,14 +76,14 @@ FROM production.products AS p
     /**where**/ 
     /**orderby**/");
 
-            var categoryIdx = types.IndexOf(typeof(CategoryEntity));
+            var categoryIdx = types.IndexOf(typeof(Category));
             var products = await connection.QueryAsync(template.RawSql, types: types.ToArray(), map: (data) =>
             {
-                var product = data[0] as ProductEntity;
+                var product = data[0] as Product;
 
                 if (categoryIdx > -1)
                 {
-                    var category = data[categoryIdx] as CategoryEntity;
+                    var category = data[categoryIdx] as Category;
                     product.Category = category;
                 }
 

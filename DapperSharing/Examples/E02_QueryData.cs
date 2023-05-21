@@ -11,7 +11,7 @@ namespace DapperSharing.Examples
         public static async Task Run()
         {
             Console.WriteLine("=========== RUNNING E02_QueryData ===========");
-            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+            //Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
             using (var connection = new SqlConnection(Program.DBInfo.ConnectionString))
             {
@@ -38,9 +38,9 @@ namespace DapperSharing.Examples
 
         static async Task QuerySingleRow(IDbConnection connection)
         {
-            var sql = @"SELECT * FROM production.products WHERE product_id=1";
+            var sql = @"SELECT * FROM production.products WHERE ProductId=1";
 
-            var entity = await connection.QueryFirstOrDefaultAsync<ProductEntity>(sql);
+            var entity = await connection.QueryFirstOrDefaultAsync<Product>(sql);
 
             DisplayHelper.PrintJson(entity);
         }
@@ -49,7 +49,7 @@ namespace DapperSharing.Examples
         {
             var sql = @"SELECT * FROM production.products WHERE model_year=2016";
 
-            var results = await connection.QueryAsync<ProductEntity>(sql);
+            var results = await connection.QueryAsync<Product>(sql);
 
             DisplayHelper.PrintJson(results);
         }
@@ -57,14 +57,14 @@ namespace DapperSharing.Examples
         static async Task QueryMultiResults(IDbConnection connection)
         {
             var sql = @"
-SELECT * FROM production.products WHERE product_id=1;
+SELECT * FROM production.products WHERE ProductId=1;
 SELECT * FROM production.products WHERE model_year=2016;";
 
             using (var multi = await connection.QueryMultipleAsync(sql))
             {
-                var entity = await multi.ReadFirstOrDefaultAsync<ProductEntity>();
+                var entity = await multi.ReadFirstOrDefaultAsync<Product>();
 
-                var results = await multi.ReadAsync<ProductEntity>();
+                var results = await multi.ReadAsync<Product>();
 
                 DisplayHelper.PrintJson(entity);
 
@@ -74,7 +74,7 @@ SELECT * FROM production.products WHERE model_year=2016;";
 
         static async Task QuerySpecificColumns(IDbConnection connection)
         {
-            var sql = @"SELECT product_id, product_name FROM production.products WHERE product_id=1";
+            var sql = @"SELECT ProductId, ProductName FROM production.products WHERE ProductId=1";
 
             var entity = await connection.QueryFirstOrDefaultAsync(sql);
 

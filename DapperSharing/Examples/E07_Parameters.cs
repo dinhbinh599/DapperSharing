@@ -36,9 +36,9 @@ namespace DapperSharing.Examples
                 Console.Write("Search products: ");
                 var search = Console.ReadLine();
 
-                var sql = @$"SELECT * FROM production.products WHERE product_name LIKE '%{search}%'";
+                var sql = @$"SELECT * FROM production.products WHERE ProductName LIKE '%{search}%'";
 
-                var products = await connection.QueryAsync<ProductEntity>(sql);
+                var products = await connection.QueryAsync<Product>(sql);
 
                 DisplayHelper.PrintJson(products);
             }
@@ -54,9 +54,9 @@ namespace DapperSharing.Examples
 
             var sql = @"
 SELECT * FROM production.products 
-WHERE product_name LIKE @Search OR model_year = @Year";
+WHERE ProductName LIKE @Search OR model_year = @Year";
 
-            var products = await connection.QueryAsync<ProductEntity>(sql, new
+            var products = await connection.QueryAsync<Product>(sql, new
             {
                 Search = $"%{search}%",
                 Year = 2016
@@ -75,19 +75,19 @@ WHERE product_name LIKE @Search OR model_year = @Year";
 
             var sql = @"
 SELECT * FROM production.products 
-WHERE product_name LIKE @NameContains
-    OR product_name = @NameEquals
+WHERE ProductName LIKE @NameContains
+    OR ProductName = @NameEquals
     OR category_id = @CategoryId
-    OR product_id = @ProductId;";
+    OR ProductId = @ProductId;";
 
-            var products = await connection.QueryAsync<ProductEntity>(sql, dynamicParameters);
+            var products = await connection.QueryAsync<Product>(sql, dynamicParameters);
 
             DisplayHelper.PrintJson(products);
         }
 
         static async Task StringParameters(IDbConnection connection)
         {
-            string sql = @"SELECT * FROM production.products WHERE product_name LIKE @Name";
+            string sql = @"SELECT * FROM production.products WHERE ProductName LIKE @Name";
 
             var dbParams = new DbString()
             {
@@ -97,7 +97,7 @@ WHERE product_name LIKE @NameContains
                 Length = 7
             };
 
-            var firstProduct = await connection.QueryFirstOrDefaultAsync<ProductEntity>(sql,
+            var firstProduct = await connection.QueryFirstOrDefaultAsync<Product>(sql,
                 new
                 {
                     Name = dbParams
@@ -108,9 +108,9 @@ WHERE product_name LIKE @NameContains
 
         static async Task WhereInParameters(IDbConnection connection)
         {
-            string sql = @"SELECT * FROM production.products WHERE product_id IN @Ids";
+            string sql = @"SELECT * FROM production.products WHERE ProductId IN @Ids";
 
-            var products = await connection.QueryAsync<ProductEntity>(sql,
+            var products = await connection.QueryAsync<Product>(sql,
                 new
                 {
                     Ids = new[] { 1, 2, 4, 5 }
@@ -129,9 +129,9 @@ CREATE OR ALTER PROC {ProcName}
    @ModelYear          INT                   OUTPUT
 AS
    SELECT
-      @Name=product_name,
+      @Name=ProductName,
       @ModelYear=model_year FROM production.products
-   WHERE product_id=@ProductId
+   WHERE ProductId=@ProductId
 ";
 
             await connection.ExecuteAsync(createProcSql);

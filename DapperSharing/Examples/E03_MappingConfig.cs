@@ -12,11 +12,19 @@ namespace DapperSharing.Examples
             Console.WriteLine("=========== RUNNING E03_MappingConfig ===========");
             using (var connection = new SqlConnection(Program.DBInfo.ConnectionString))
             {
-                await QueryDefault(connection);
-
-                await QueryMatchingUnderscores(connection);
-
-                await QueryCustomMapping(connection);
+                var userInput = Console.ReadLine();
+                switch (userInput)
+                {
+                    case "1":
+                        await QueryDefault(connection);
+                        break;
+                    case "2":
+                        await QueryMatchingUnderscores(connection);
+                        break;
+                    case "3":
+                        await QueryCustomMapping(connection);
+                        break;
+                }
             }
         }
 
@@ -29,7 +37,7 @@ namespace DapperSharing.Examples
 
         static async Task QueryDefault(IDbConnection connection)
         {
-            var sql = @"SELECT * FROM production.products";
+            var sql = @"SELECT ProductId AS product_id FROM production.products";
 
             var products = await connection.QueryAsync<DefaultProductModel>(sql);
 
@@ -47,7 +55,7 @@ namespace DapperSharing.Examples
         {
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
-            var sql = @"SELECT * FROM production.products";
+            var sql = @"SELECT ProductId AS product_id FROM production.products";
 
             var products = await connection.QueryAsync<MatchingUnderscoresProductModel>(sql);
 
@@ -69,7 +77,7 @@ namespace DapperSharing.Examples
                 typeof(CustomMappingProductModel),
                 (type, columnName) =>
                 {
-                    if (columnName == "product_id")
+                    if (columnName == "ProductId")
                     {
                         return type.GetProperty(nameof(CustomMappingProductModel.CustomProductId));
                     }

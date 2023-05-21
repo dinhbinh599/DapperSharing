@@ -23,12 +23,12 @@ namespace DapperSharing.Examples
         {
             var sql = @"
 INSERT INTO production.products
-    (product_name, brand_id, category_id, model_year, list_price)
-OUTPUT inserted.product_id
+    (ProductName, brand_id, category_id, model_year, list_price)
+OUTPUT inserted.ProductId
 VALUES 
     (@ProductName, @BrandId, @CategoryId, @ModelYear, @ListPrice);";
 
-            var id = await connection.ExecuteScalarAsync<int>(sql, new ProductEntity
+            var id = await connection.ExecuteScalarAsync<int>(sql, new Product
             {
                 BrandId = 1,
                 CategoryId = 1,
@@ -46,9 +46,9 @@ VALUES
         {
             var sql = @"
 UPDATE production.products SET 
-    product_name=@ProductName,
+    ProductName=@ProductName,
     model_year=@ModelYear
-WHERE product_id=@ProductId;";
+WHERE ProductId=@ProductId;";
 
             var count = await connection.ExecuteAsync(sql, new
             {
@@ -64,7 +64,7 @@ WHERE product_id=@ProductId;";
         {
             var sql = @"
 UPDATE production.products SET 
-    product_name=''
+    ProductName=''
 WHERE model_year=@ModelYear;
 
 DELETE FROM production.products

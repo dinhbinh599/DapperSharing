@@ -27,14 +27,14 @@ namespace DapperSharing.Examples
         {
             var sql = @"
 SELECT 
-    p.product_id, 
-    p.product_name,
+    p.ProductId, 
+    p.ProductName,
     c.category_id,
     c.category_name
 FROM production.products p
 INNER JOIN production.categories c ON p.category_id = c.category_id;";
 
-            var result = await connection.QueryAsync<ProductEntity, CategoryEntity, ProductEntity>(sql,
+            var result = await connection.QueryAsync<Product, Category, Product>(sql,
                 (product, category) =>
                 {
                     product.Category = category;
@@ -50,26 +50,26 @@ INNER JOIN production.categories c ON p.category_id = c.category_id;";
 SELECT 
     s.store_id,
     s.store_name,
-    p.product_id, 
-    p.product_name
+    p.ProductId, 
+    p.ProductName
 FROM sales.stores s
 INNER JOIN production.stocks st ON s.store_id = st.store_id
-INNER JOIN production.products p ON st.product_id = p.product_id;";
+INNER JOIN production.products p ON st.ProductId = p.ProductId;";
 
-            var storeMap = new Dictionary<int, StoreEntity>();
+            var storeMap = new Dictionary<int, Category>();
 
-            var result = await connection.QueryAsync<StoreEntity, ProductEntity, StoreEntity>(sql,
+            var result = await connection.QueryAsync<Category, Product, Category>(sql,
                 (store, product) =>
                 {
-                    if (!storeMap.TryGetValue(store.StoreId, out var cachedStore))
+                    if (!storeMap.TryGetValue(store.CategoryId, out var cachedStore))
                     {
                         cachedStore = store;
-                        cachedStore.Products ??= new List<ProductEntity>();
-                        storeMap[cachedStore.StoreId] = cachedStore;
+                        cachedStore.Products ??= new List<Product>();
+                        storeMap[cachedStore.CategoryId] = cachedStore;
                     }
                     cachedStore.Products.Add(product);
                     return cachedStore;
-                }, splitOn: "product_id");
+                }, splitOn: "ProductId");
 
             DisplayHelper.PrintJson(storeMap.Values);
         }
@@ -78,32 +78,32 @@ INNER JOIN production.products p ON st.product_id = p.product_id;";
         {
             var sql = @"
 SELECT 
-    s.store_id,
-    s.store_name,
-    p.product_id, 
-    p.product_name,
-    c.category_id,
-    c.category_name
+    s.BrandId,
+    s.BrandName,
+    p.ProductId, 
+    p.ProductName,
+    c.CategoryId,
+    c.CategoryName
 FROM sales.stores s
-INNER JOIN production.stocks st ON s.store_id = st.store_id
-INNER JOIN production.products p ON st.product_id = p.product_id
-INNER JOIN production.categories c ON p.category_id = c.category_id;";
+INNER JOIN production.stocks st ON s.BrandId = st.BrandId
+INNER JOIN production.products p ON st.ProductId = p.ProductId
+INNER JOIN production.categories c ON p.CategoryId = c.CategoryId;";
 
-            var storeMap = new Dictionary<int, StoreEntity>();
+            var storeMap = new Dictionary<int, Brand>();
 
-            var result = await connection.QueryAsync<StoreEntity, ProductEntity, CategoryEntity, StoreEntity>(sql,
-                (store, product, category) =>
+            var result = await connection.QueryAsync<Brand, Product, Category, Brand>(sql,
+                (brand, product, category) =>
                 {
-                    if (!storeMap.TryGetValue(store.StoreId, out var cachedStore))
+                    if (!storeMap.TryGetValue(brand.BrandId, out var cachedBrand))
                     {
-                        cachedStore = store;
-                        cachedStore.Products ??= new List<ProductEntity>();
-                        storeMap[cachedStore.StoreId] = cachedStore;
+                        cachedBrand = brand;
+                        cachedBrand.Products ??= new List<Product>();
+                        storeMap[brand.BrandId] = cachedBrand;
                     }
                     product.Category = category;
-                    cachedStore.Products.Add(product);
-                    return cachedStore;
-                }, splitOn: "product_id,category_id");
+                    cachedBrand.Products.Add(product);
+                    return cachedBrand;
+                }, splitOn: "ProductId,category_id");
 
             DisplayHelper.PrintJson(storeMap.Values);
         }
