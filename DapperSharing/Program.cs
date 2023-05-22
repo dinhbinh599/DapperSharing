@@ -52,8 +52,8 @@ namespace DapperSharing
 
         internal static partial class DBInfo
         {
-            public const string ConnectionString = "Server=DESKTOP-RESKER;Database=BikeStores;Trusted_Connection=True;Encrypt=False";
-            //public const string ConnectionStringError = "Server=123;Database=BikeStores;Trusted_Connection=True;Encrypt=False";
+            //public const string ConnectionString = "Server=DESKTOP-RESKER;Database=BikeStores;Trusted_Connection=True;Encrypt=False";
+            public const string ConnectionString = "Server=TUANPHAM;Database=BikeStores;Trusted_Connection=True;Encrypt=False";
         }
     }
 }

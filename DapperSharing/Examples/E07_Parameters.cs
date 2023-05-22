@@ -11,21 +11,33 @@ namespace DapperSharing.Examples
         public static async Task Run()
         {
             Console.WriteLine("=========== RUNNING E07_Parameters ===========");
+            DisplayHelper.PrintListOfMethods(typeof(E07_Parameters));
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
             using (var connection = new SqlConnection(Program.DBInfo.ConnectionString))
             {
-                await SqlInjection(connection);
-
-                await AnonymousParameters(connection);
-
-                await DynamicParameters(connection);
-
-                await StringParameters(connection);
-
-                await WhereInParameters(connection);
-
-                await OutputParameters(connection);
+                var userInput = Console.ReadLine();
+                switch (userInput)
+                {
+                    case "1":
+                        await SqlInjection(connection);
+                        break;
+                    case "2":
+                        await AnonymousParameters(connection);
+                        break;
+                    case "3":
+                        await DynamicParameters(connection);
+                        break;
+                    case "4":
+                        await StringParameters(connection);
+                        break;
+                    case "5":
+                        await WhereInParameters(connection);
+                        break;
+                    case "6":
+                        await OutputParameters(connection);
+                        break;
+                }
             }
         }
 
@@ -54,7 +66,7 @@ namespace DapperSharing.Examples
 
             var sql = @"
 SELECT * FROM production.products 
-WHERE ProductName LIKE @Search OR model_year = @Year";
+WHERE ProductName LIKE @Search OR ModelYear = @Year";
 
             var products = await connection.QueryAsync<Product>(sql, new
             {
@@ -77,7 +89,7 @@ WHERE ProductName LIKE @Search OR model_year = @Year";
 SELECT * FROM production.products 
 WHERE ProductName LIKE @NameContains
     OR ProductName = @NameEquals
-    OR category_id = @CategoryId
+    OR CategoryId = @CategoryId
     OR ProductId = @ProductId;";
 
             var products = await connection.QueryAsync<Product>(sql, dynamicParameters);
@@ -130,7 +142,7 @@ CREATE OR ALTER PROC {ProcName}
 AS
    SELECT
       @Name=ProductName,
-      @ModelYear=model_year FROM production.products
+      @ModelYear=ModelYear FROM production.products
    WHERE ProductId=@ProductId
 ";
 

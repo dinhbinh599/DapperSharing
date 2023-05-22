@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using DapperSharing.Utils;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
@@ -9,7 +10,8 @@ namespace DapperSharing.Examples
         public static async Task Run()
         {
             Console.WriteLine("=========== RUNNING E08_Others ===========");
-            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+            DisplayHelper.PrintListOfMethods(typeof(E08_Others));
+            //Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
             using (var connection = new SqlConnection(Program.DBInfo.ConnectionString))
             {

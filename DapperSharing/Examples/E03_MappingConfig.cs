@@ -10,6 +10,7 @@ namespace DapperSharing.Examples
         public static async Task Run()
         {
             Console.WriteLine("=========== RUNNING E03_MappingConfig ===========");
+            DisplayHelper.PrintListOfMethods(typeof(E03_MappingConfig));
             using (var connection = new SqlConnection(Program.DBInfo.ConnectionString))
             {
                 var userInput = Console.ReadLine();

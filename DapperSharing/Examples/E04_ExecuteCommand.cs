@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using DapperSharing.Models;
+using DapperSharing.Utils;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
@@ -9,13 +10,21 @@ namespace DapperSharing.Examples
     {
         public static async Task Run()
         {
+            Console.WriteLine("=========== RUNNING E04_ExecuteCommand ===========");
+            DisplayHelper.PrintListOfMethods(typeof(E04_ExecuteCommand));
             using (var connection = new SqlConnection(Program.DBInfo.ConnectionString))
             {
-                var insertedId = await Insert(connection);
-
-                await Update(connection, insertedId);
-
-                await MultipleCommands(connection);
+                var userInput = Console.ReadLine();
+                switch (userInput)
+                {
+                    case "1":
+                        var insertedId = await Insert(connection);
+                        await Update(connection, insertedId);
+                        break;
+                    case "2":
+                        await MultipleCommands(connection);
+                        break;
+                }
             }
         }
 
@@ -23,7 +32,7 @@ namespace DapperSharing.Examples
         {
             var sql = @"
 INSERT INTO production.products
-    (ProductName, brand_id, category_id, model_year, list_price)
+    (ProductName, BrandId, CategoryId, ModelYear, ListPrice)
 OUTPUT inserted.ProductId
 VALUES 
     (@ProductName, @BrandId, @CategoryId, @ModelYear, @ListPrice);";
@@ -47,7 +56,7 @@ VALUES
             var sql = @"
 UPDATE production.products SET 
     ProductName=@ProductName,
-    model_year=@ModelYear
+    ModelYear=@ModelYear
 WHERE ProductId=@ProductId;";
 
             var count = await connection.ExecuteAsync(sql, new
@@ -65,10 +74,10 @@ WHERE ProductId=@ProductId;";
             var sql = @"
 UPDATE production.products SET 
     ProductName=''
-WHERE model_year=@ModelYear;
+WHERE ModelYear=@ModelYear;
 
 DELETE FROM production.products
-WHERE model_year=@ModelYear;";
+WHERE ModelYear=@ModelYear;";
 
             var count = await connection.ExecuteAsync(sql, new
             {

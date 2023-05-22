@@ -3,6 +3,7 @@ using DapperSharing.Models;
 using DapperSharing.Utils;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using System.Reflection;
 
 namespace DapperSharing.Examples
 {
@@ -11,19 +12,30 @@ namespace DapperSharing.Examples
         public static async Task Run()
         {
             Console.WriteLine("=========== RUNNING E02_QueryData ===========");
+            DisplayHelper.PrintListOfMethods(typeof(E02_QueryData));
             //Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
             using (var connection = new SqlConnection(Program.DBInfo.ConnectionString))
             {
-                await QueryScalar(connection);
-
-                await QuerySingleRow(connection);
-
-                await QueryMultipleRows(connection);
-
-                await QueryMultiResults(connection);
-
-                await QuerySpecificColumns(connection);
+                var userInput = Console.ReadLine();
+                switch (userInput)
+                {
+                    case "1":
+                        await QueryScalar(connection);
+                        break;
+                    case "2":
+                        await QuerySingleRow(connection);
+                        break;
+                    case "3":
+                        await QueryMultipleRows(connection);
+                        break;
+                    case "4":
+                        await QueryMultiResults(connection);
+                        break;
+                    case "5":
+                        await QuerySpecificColumns(connection);
+                        break;
+                }
             }
         }
 
@@ -47,7 +59,7 @@ namespace DapperSharing.Examples
 
         static async Task QueryMultipleRows(IDbConnection connection)
         {
-            var sql = @"SELECT * FROM production.products WHERE model_year=2016";
+            var sql = @"SELECT * FROM production.products WHERE ModelYear=2016";
 
             var results = await connection.QueryAsync<Product>(sql);
 
@@ -58,7 +70,7 @@ namespace DapperSharing.Examples
         {
             var sql = @"
 SELECT * FROM production.products WHERE ProductId=1;
-SELECT * FROM production.products WHERE model_year=2016;";
+SELECT * FROM production.products WHERE ModelYear=2016;";
 
             using (var multi = await connection.QueryMultipleAsync(sql))
             {

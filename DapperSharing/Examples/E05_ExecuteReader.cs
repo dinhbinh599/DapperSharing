@@ -8,6 +8,7 @@ namespace DapperSharing.Examples
     {
         public static async Task Run()
         {
+            Console.WriteLine("=========== RUNNING E05_ExecuteReader ===========");
             using (var connection = new SqlConnection(Program.DBInfo.ConnectionString))
             {
                 await QueryProducts(connection);

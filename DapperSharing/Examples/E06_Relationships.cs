@@ -11,15 +11,24 @@ namespace DapperSharing.Examples
         public static async Task Run()
         {
             Console.WriteLine("=========== RUNNING E06_Relationships ===========");
-            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+            DisplayHelper.PrintListOfMethods(typeof(E06_Relationships));
+            //Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
             using (var connection = new SqlConnection(Program.DBInfo.ConnectionString))
             {
-                await QueryOneToMany(connection);
-
-                await QueryManyToMany(connection);
-
-                await QueryMultipleRelationships(connection);
+                var userInput = Console.ReadLine();
+                switch (userInput)
+                {
+                    case "1":
+                        await QueryOneToMany(connection);
+                        break;
+                    case "2":
+                        await QueryManyToMany(connection);
+                        break;
+                    case "3":
+                        await QueryMultipleRelationships(connection);
+                        break;
+                }
             }
         }
 
@@ -29,17 +38,17 @@ namespace DapperSharing.Examples
 SELECT 
     p.ProductId, 
     p.ProductName,
-    c.category_id,
-    c.category_name
+    c.CategoryId,
+    c.CategoryName
 FROM production.products p
-INNER JOIN production.categories c ON p.category_id = c.category_id;";
+INNER JOIN production.categories c ON p.CategoryId = c.CategoryId;";
 
             var result = await connection.QueryAsync<Product, Category, Product>(sql,
                 (product, category) =>
                 {
                     product.Category = category;
                     return product;
-                }, splitOn: "category_id");
+                }, splitOn: "CategoryId");
 
             DisplayHelper.PrintJson(result);
         }
@@ -103,7 +112,7 @@ INNER JOIN production.categories c ON p.CategoryId = c.CategoryId;";
                     product.Category = category;
                     cachedBrand.Products.Add(product);
                     return cachedBrand;
-                }, splitOn: "ProductId,category_id");
+                }, splitOn: "ProductId,CategoryId");
 
             DisplayHelper.PrintJson(storeMap.Values);
         }

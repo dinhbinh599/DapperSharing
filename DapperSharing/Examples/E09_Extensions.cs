@@ -23,7 +23,7 @@ namespace DapperSharing.Examples
         {
             var builder = new SqlBuilder()
                 .Select("p.*")
-                .OrderBy("p.model_year DESC, p.ProductName ASC");
+                .OrderBy("p.ModelYear DESC, p.ProductName ASC");
             var types = new List<Type>
             {
                 typeof(Product)
@@ -49,20 +49,20 @@ namespace DapperSharing.Examples
 
             if (!string.IsNullOrWhiteSpace(category))
             {
-                builder.InnerJoin("production.categories as c ON p.category_id = c.category_id")
-                    .Select("c.category_id, c.category_name")
-                    .Where("c.category_name LIKE @CategorySearch", new
+                builder.InnerJoin("production.categories as c ON p.CategoryId = c.CategoryId")
+                    .Select("c.CategoryId, c.CategoryName")
+                    .Where("c.CategoryName LIKE @CategorySearch", new
                     {
                         CategorySearch = $"%{category}%"
                     });
 
                 types.Add(typeof(Category));
-                splitOns.Add("category_id");
+                splitOns.Add("CategoryId");
             }
 
             if (modelYear > 0)
             {
-                builder.Where("p.model_year = @Year", new
+                builder.Where("p.ModelYear = @Year", new
                 {
                     Year = modelYear
                 });
