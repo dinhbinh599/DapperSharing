@@ -14,6 +14,7 @@ namespace DapperSharing
             while (true)
             {
                 Console.WriteLine("=========== GETTING STARTED ===========");
+                DisplayHelper.PrintAllClassNames(typeof(E01_QuickStart).Namespace);
                 var userInput = Console.ReadLine();
                 switch (userInput)
                 {
@@ -21,7 +22,7 @@ namespace DapperSharing
                         E01_QuickStart.Run();
                         break;
                     case "2":
-                        await E02_QueryData.Run();
+                        E02_QueryData.Run();
                         break;
                     case "3":
                         await E03_MappingConfig.Run();
@@ -52,8 +53,8 @@ namespace DapperSharing
 
         internal static partial class DBInfo
         {
-            //public const string ConnectionString = "Server=DESKTOP-RESKER;Database=BikeStores;Trusted_Connection=True;Encrypt=False";
-            public const string ConnectionString = "Server=TUANPHAM;Database=BikeStores;Trusted_Connection=True;Encrypt=False";
+            public const string ConnectionString = "Server=DESKTOP-RESKER;Database=BikeStores;Trusted_Connection=True;Encrypt=False";
+            //public const string ConnectionString = "Server=TUANPHAM;Database=BikeStores;Trusted_Connection=True;Encrypt=False";
         }
     }
 }

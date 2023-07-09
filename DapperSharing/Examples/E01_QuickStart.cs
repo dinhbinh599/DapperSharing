@@ -9,7 +9,7 @@ namespace DapperSharing.Examples
     {
         public static void Run()
         {
-            Console.WriteLine("=========== RUNNING E01_QuickStart ===========");
+            Console.WriteLine($"=========== RUNNING {nameof(E01_QuickStart)} ===========");
 
             IEnumerable<Product> results;
             using (var connection = new SqlConnection(Program.DBInfo.ConnectionString))
@@ -20,7 +20,7 @@ ORDER BY ProductId
 OFFSET 0 ROWS
 FETCH NEXT 10 ROWS ONLY";
 
-                results = connection.Query<Product>(sql).ToList();
+                results = connection.Query<Product>(sql);
             }
 
             DisplayHelper.PrintJson(results);

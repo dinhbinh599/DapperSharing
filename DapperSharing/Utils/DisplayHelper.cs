@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace DapperSharing.Utils
 {
@@ -26,6 +27,17 @@ namespace DapperSharing.Utils
             {
                 Console.WriteLine($"{countMethod}. {method.Name}");
                 countMethod++;
+            }
+        }
+
+        public static void PrintAllClassNames(string myNameSpace)
+        {
+            var classNamesList = Assembly.GetExecutingAssembly().GetTypes()
+                    .Where(t => t.IsClass && t.IsPublic && t.Namespace == myNameSpace)
+                    .Select(t => t.Name);
+            foreach (var className in classNamesList)
+            {
+                Console.WriteLine(className);
             }
         }
 

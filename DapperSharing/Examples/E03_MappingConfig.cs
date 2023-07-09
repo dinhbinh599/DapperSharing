@@ -9,22 +9,27 @@ namespace DapperSharing.Examples
     {
         public static async Task Run()
         {
-            Console.WriteLine("=========== RUNNING E03_MappingConfig ===========");
-            DisplayHelper.PrintListOfMethods(typeof(E03_MappingConfig));
-            using (var connection = new SqlConnection(Program.DBInfo.ConnectionString))
+            while (true)
             {
-                var userInput = Console.ReadLine();
-                switch (userInput)
+                Console.WriteLine("=========== RUNNING E03_MappingConfig ===========");
+                DisplayHelper.PrintListOfMethods(typeof(E03_MappingConfig));
+                using (var connection = new SqlConnection(Program.DBInfo.ConnectionString))
                 {
-                    case "1":
-                        await QueryDefault(connection);
-                        break;
-                    case "2":
-                        await QueryMatchingUnderscores(connection);
-                        break;
-                    case "3":
-                        await QueryCustomMapping(connection);
-                        break;
+                    var userInput = Console.ReadLine();
+                    switch (userInput)
+                    {
+                        case "1":
+                            await QueryDefault(connection);
+                            break;
+                        case "2":
+                            await QueryMatchingUnderscores(connection);
+                            break;
+                        case "3":
+                            await QueryCustomMapping(connection);
+                            break;
+                        case "b":
+                            return;
+                    }
                 }
             }
         }
@@ -59,6 +64,8 @@ namespace DapperSharing.Examples
             var sql = @"SELECT ProductId AS product_id FROM production.products";
 
             var products = await connection.QueryAsync<MatchingUnderscoresProductModel>(sql);
+
+            //Dapper.DefaultTypeMap.MatchNamesWithUnderscores = false;
 
             DisplayHelper.PrintJson(products);
         }

@@ -9,74 +9,79 @@ namespace DapperSharing.Examples
 {
     public static class E02_QueryData
     {
-        public static async Task Run()
+        public static void Run()
         {
-            Console.WriteLine("=========== RUNNING E02_QueryData ===========");
-            DisplayHelper.PrintListOfMethods(typeof(E02_QueryData));
-            //Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-            using (var connection = new SqlConnection(Program.DBInfo.ConnectionString))
+            while (true)
             {
+                Console.WriteLine("=========== RUNNING E02_QueryData ===========");
+                DisplayHelper.PrintListOfMethods(typeof(E02_QueryData));
+                //Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
                 var userInput = Console.ReadLine();
-                switch (userInput)
+                using (var connection = new SqlConnection(Program.DBInfo.ConnectionString))
                 {
-                    case "1":
-                        await QueryScalar(connection);
-                        break;
-                    case "2":
-                        await QuerySingleRow(connection);
-                        break;
-                    case "3":
-                        await QueryMultipleRows(connection);
-                        break;
-                    case "4":
-                        await QueryMultiResults(connection);
-                        break;
-                    case "5":
-                        await QuerySpecificColumns(connection);
-                        break;
+                    switch (userInput)
+                    {
+                        case "1":
+                            QueryScalar(connection);
+                            break;
+                        case "2":
+                            QuerySingleRow(connection);
+                            break;
+                        case "3":
+                            QueryMultipleRows(connection);
+                            break;
+                        case "4":
+                            QueryMultiResults(connection);
+                            break;
+                        case "5":
+                            QuerySpecificColumns(connection);
+                            break;
+                        case "b":
+                            return;
+                        }
                 }
             }
         }
 
-        static async Task QueryScalar(IDbConnection connection)
+        static void QueryScalar(IDbConnection connection)
         {
             var sql = @"SELECT COUNT(*) FROM production.products";
 
-            var count = await connection.ExecuteScalarAsync<int>(sql);
+            var count = connection.ExecuteScalar<int>(sql);
 
             Console.WriteLine($"Product count: {count}");
         }
 
-        static async Task QuerySingleRow(IDbConnection connection)
+        static void QuerySingleRow(IDbConnection connection)
         {
             var sql = @"SELECT * FROM production.products WHERE ProductId=1";
 
-            var entity = await connection.QueryFirstOrDefaultAsync<Product>(sql);
+            var entity = connection.QueryFirstOrDefault<Product>(sql);
 
             DisplayHelper.PrintJson(entity);
         }
 
-        static async Task QueryMultipleRows(IDbConnection connection)
+        static void QueryMultipleRows(IDbConnection connection)
         {
             var sql = @"SELECT * FROM production.products WHERE ModelYear=2016";
 
-            var results = await connection.QueryAsync<Product>(sql);
+            var results = connection.Query<Product>(sql);
 
             DisplayHelper.PrintJson(results);
         }
 
-        static async Task QueryMultiResults(IDbConnection connection)
+        static void QueryMultiResults(IDbConnection connection)
         {
             var sql = @"
 SELECT * FROM production.products WHERE ProductId=1;
 SELECT * FROM production.products WHERE ModelYear=2016;";
 
-            using (var multi = await connection.QueryMultipleAsync(sql))
+            using (var multi = connection.QueryMultiple(sql))
             {
-                var entity = await multi.ReadFirstOrDefaultAsync<Product>();
+                var entity = multi.ReadFirstOrDefault<Product>();
 
-                var results = await multi.ReadAsync<Product>();
+                var results = multi.Read<Product>();
 
                 DisplayHelper.PrintJson(entity);
 
@@ -84,11 +89,11 @@ SELECT * FROM production.products WHERE ModelYear=2016;";
             }
         }
 
-        static async Task QuerySpecificColumns(IDbConnection connection)
+        static void QuerySpecificColumns(IDbConnection connection)
         {
             var sql = @"SELECT ProductId, ProductName FROM production.products WHERE ProductId=1";
 
-            var entity = await connection.QueryFirstOrDefaultAsync(sql);
+            var entity = connection.QueryFirstOrDefault(sql);
 
             DisplayHelper.PrintJson(entity);
         }
