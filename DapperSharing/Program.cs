@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using BenchmarkDotNet.Running;
+using Dapper;
 using DapperSharing.Examples;
 using DapperSharing.Models;
 using DapperSharing.Utils;
@@ -45,6 +46,10 @@ namespace DapperSharing
                     case "9":
                         await E09_Extensions.Run();
                         break;
+                    case "10":
+                        BenchmarkRunner.Run<E10_Benchmark>();
+                        Console.ReadLine();
+                        break;
                     case "end":
                         return;
                 }
@@ -53,8 +58,8 @@ namespace DapperSharing
 
         internal static partial class DBInfo
         {
-            public const string ConnectionString = "Server=DESKTOP-RESKER;Database=BikeStores;Trusted_Connection=True;Encrypt=False";
-            //public const string ConnectionString = "Server=TUANPHAM;Database=BikeStores;Trusted_Connection=True;Encrypt=False";
+            //public const string ConnectionString = "Server=DESKTOP-RESKER;Database=BikeStores;Trusted_Connection=True;Encrypt=False";
+            public const string ConnectionString = "Server=TUANPHAM;Database=BikeStores;Trusted_Connection=True;Encrypt=False";
         }
     }
 }
