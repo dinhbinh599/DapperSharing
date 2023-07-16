@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using DapperSharing.Models;
+using DapperSharing.Models.TableValue;
 using DapperSharing.Utils;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -36,6 +37,9 @@ namespace DapperSharing.Examples
                         break;
                     case "6":
                         await OutputParameters(connection);
+                        break;
+                    case "7":
+                        await TableValuedParameters(connection);
                         break;
                 }
             }
@@ -162,5 +166,20 @@ AS
 
             Console.WriteLine($"{name} - {modelYear}");
         }
+
+        static async Task TableValuedParameters(IDbConnection connection)
+        {
+            var tvpExampleType = new DataTable();
+            tvpExampleType.Columns.Add("Id", typeof(int));
+            tvpExampleType.Columns.Add("Name", typeof(string));
+
+            tvpExampleType.Rows.Add(1, "Jake");
+            tvpExampleType.Rows.Add(2, "Benny");
+
+            var p = new DynamicParameters();
+            p.Add("TvpExampleType", tvpExampleType.AsTableValuedParameter("dbo.TvpExampleType"));
+            await connection.ExecuteAsync("dbo.MyStoredProc", p, commandType: CommandType.StoredProcedure);
+        }
     }
 }
+

@@ -6,8 +6,10 @@ namespace DapperSharing.Models;
 
 public partial class BikeStoresContext : DbContext
 {
-    public BikeStoresContext()
+    private readonly string _connectionString;
+    public BikeStoresContext(string connectionString)
     {
+        _connectionString = connectionString;
     }
 
     public BikeStoresContext(DbContextOptions<BikeStoresContext> options)
@@ -34,7 +36,7 @@ public partial class BikeStoresContext : DbContext
     public virtual DbSet<Store> Stores { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer(Program.DBInfo.ConnectionString);
+        => optionsBuilder.UseSqlServer(_connectionString);
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
