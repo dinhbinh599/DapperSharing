@@ -18,53 +18,42 @@ namespace DapperSharing.Examples
                 //Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
                 var userInput = Console.ReadLine();
-                using (var connection = new SqlConnection(Program.DBInfo.ConnectionString))
+                using var connection = new SqlConnection(Program.DBInfo.ConnectionString);
+                switch (userInput)
                 {
-                    switch (userInput)
-                    {
-                        case "1":
-                            QueryScalar(connection);
-                            break;
-                        case "2":
-                            QuerySingleRow(connection);
-                            break;
-                        case "3":
-                            QueryMultipleRows(connection);
-                            break;
-                        case "4":
-                            QueryMultiResults(connection);
-                            break;
-                        case "5":
-                            QuerySpecificColumns(connection);
-                            break;
-                        case "b":
-                            return;
-                        }
+                    case "1":
+                        QuerySingleRow(connection);
+                        break;
+                    case "2":
+                        QueryMultipleRows(connection);
+                        break;
+                    case "3":
+                        QueryMultiResults(connection);
+                        break;
+                    case "4":
+                        QuerySpecificColumns(connection);
+                        break;
+                    case "5":
+                        QueryScalarValues(connection);
+                        break;
+                    case "b":
+                        return;
                 }
             }
         }
 
-        static void QueryScalar(IDbConnection connection)
-        {
-            var sql = @"SELECT COUNT(*) FROM production.products";
-
-            var count = connection.ExecuteScalar<int>(sql);
-
-            Console.WriteLine($"Product count: {count}");
-        }
-
         static void QuerySingleRow(IDbConnection connection)
         {
-            var sql = @"SELECT * FROM production.products WHERE ProductId=1";
+            var sql = @"SELECT top 10 * FROM production.products
+                        WHERE ModelYear = 2016";
 
-            var entity = connection.QueryFirstOrDefault<Product>(sql);
-
+            var entity = connection.QueryFirst<Product>(sql);
             DisplayHelper.PrintJson(entity);
         }
 
         static void QueryMultipleRows(IDbConnection connection)
         {
-            var sql = @"SELECT * FROM production.products WHERE ModelYear=2016";
+            var sql = @"SELECT * FROM production.products WHERE ModelYear = 2016";
 
             var results = connection.Query<Product>(sql);
 
@@ -74,19 +63,17 @@ namespace DapperSharing.Examples
         static void QueryMultiResults(IDbConnection connection)
         {
             var sql = @"
-SELECT * FROM production.products WHERE ProductId=1;
-SELECT * FROM production.products WHERE ModelYear=2016;";
+                        SELECT * FROM production.products WHERE ProductId = 1;
+                        SELECT * FROM production.products WHERE ModelYear = 2016;";
 
-            using (var multi = connection.QueryMultiple(sql))
-            {
-                var entity = multi.ReadFirstOrDefault<Product>();
+            using var multi = connection.QueryMultiple(sql);
+            var entity = multi.ReadFirstOrDefault<Product>();
 
-                var results = multi.Read<Product>();
+            var results = multi.Read<Product>();
 
-                DisplayHelper.PrintJson(entity);
+            DisplayHelper.PrintJson(entity);
 
-                DisplayHelper.PrintJson(results);
-            }
+            DisplayHelper.PrintJson(results);
         }
 
         static void QuerySpecificColumns(IDbConnection connection)
@@ -96,6 +83,15 @@ SELECT * FROM production.products WHERE ModelYear=2016;";
             var entity = connection.QueryFirstOrDefault(sql);
 
             DisplayHelper.PrintJson(entity);
+        }
+
+        static void QueryScalarValues(IDbConnection connection)
+        {
+            var sql = @"SELECT COUNT(*) FROM production.products";
+
+            var count = connection.ExecuteScalar<int>(sql);
+
+            Console.WriteLine($"Product count: {count}");
         }
     }
 }
