@@ -44,8 +44,8 @@ namespace DapperSharing.Examples
 
         static void QuerySingleRow(IDbConnection connection)
         {
-            var sql = @"SELECT top 10 * FROM production.products
-                        WHERE ModelYear = 2016";
+            var sql = @"SELECT TOP 10 * FROM production.products
+                        WHERE ModelYear = 3000";
 
             var entity = connection.QueryFirst<Product>(sql);
             DisplayHelper.PrintJson(entity);
@@ -53,7 +53,8 @@ namespace DapperSharing.Examples
 
         static void QueryMultipleRows(IDbConnection connection)
         {
-            var sql = @"SELECT * FROM production.products WHERE ModelYear = 2016";
+            var sql = @"SELECT * FROM production.products
+                        WHERE BrandId = 4";
 
             var results = connection.Query<Product>(sql);
 
@@ -62,27 +63,29 @@ namespace DapperSharing.Examples
 
         static void QueryMultiResults(IDbConnection connection)
         {
-            var sql = @"
-                        SELECT * FROM production.products WHERE ProductId = 1;
-                        SELECT * FROM production.products WHERE ModelYear = 2016;";
+            var sql =
+                @"
+                SELECT * FROM production.products WHERE ProductId = 1;
+                SELECT * FROM production.products WHERE BrandId = 4;";
 
             using var multi = connection.QueryMultiple(sql);
             var entity = multi.ReadFirstOrDefault<Product>();
-
-            var results = multi.Read<Product>();
-
             DisplayHelper.PrintJson(entity);
 
+            var results = multi.Read<Product>();
             DisplayHelper.PrintJson(results);
         }
 
         static void QuerySpecificColumns(IDbConnection connection)
         {
-            var sql = @"SELECT ProductId, ProductName FROM production.products WHERE ProductId=1";
+            var sql = @"SELECT ProductId, ProductName FROM production.products 
+                        WHERE ProductId = 1";
 
-            var entity = connection.QueryFirstOrDefault(sql);
-
+            var entity = connection.QueryFirstOrDefault<Product>(sql);
             DisplayHelper.PrintJson(entity);
+            
+            var entity1 = connection.QueryFirstOrDefault(sql);
+            DisplayHelper.PrintJson(entity1);
         }
 
         static void QueryScalarValues(IDbConnection connection)
