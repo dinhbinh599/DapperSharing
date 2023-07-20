@@ -35,13 +35,14 @@ namespace DapperSharing.Examples
         static async Task QueryOneToMany(IDbConnection connection)
         {
             var sql = @"
-SELECT 
-    p.ProductId, 
-    p.ProductName,
-    c.CategoryId,
-    c.CategoryName
-FROM production.products p
-INNER JOIN production.categories c ON p.CategoryId = c.CategoryId;";
+                SELECT 
+                    p.ProductId, 
+                    p.ProductName,
+                    c.CategoryId,
+                    c.CategoryName
+                FROM production.products p
+                INNER JOIN production.categories c ON p.CategoryId = c.CategoryId
+                WHERE ProductId = 1";
 
             var result = await connection.QueryAsync<Product, Category, Product>(sql,
                 (product, category) =>
@@ -56,14 +57,14 @@ INNER JOIN production.categories c ON p.CategoryId = c.CategoryId;";
         static async Task QueryManyToMany(IDbConnection connection)
         {
             var sql = @"
-SELECT 
-    s.store_id,
-    s.store_name,
-    p.ProductId, 
-    p.ProductName
-FROM sales.stores s
-INNER JOIN production.stocks st ON s.store_id = st.store_id
-INNER JOIN production.products p ON st.ProductId = p.ProductId;";
+                SELECT 
+                    s.store_id,
+                    s.store_name,
+                    p.ProductId, 
+                    p.ProductName
+                FROM sales.stores s
+                INNER JOIN production.stocks st ON s.store_id = st.store_id
+                INNER JOIN production.products p ON st.ProductId = p.ProductId;";
 
             var storeMap = new Dictionary<int, Category>();
 
@@ -86,17 +87,17 @@ INNER JOIN production.products p ON st.ProductId = p.ProductId;";
         static async Task QueryMultipleRelationships(IDbConnection connection)
         {
             var sql = @"
-SELECT 
-    s.BrandId,
-    s.BrandName,
-    p.ProductId, 
-    p.ProductName,
-    c.CategoryId,
-    c.CategoryName
-FROM sales.stores s
-INNER JOIN production.stocks st ON s.BrandId = st.BrandId
-INNER JOIN production.products p ON st.ProductId = p.ProductId
-INNER JOIN production.categories c ON p.CategoryId = c.CategoryId;";
+                SELECT 
+                    s.BrandId,
+                    s.BrandName,
+                    p.ProductId, 
+                    p.ProductName,
+                    c.CategoryId,
+                    c.CategoryName
+                FROM sales.stores s
+                INNER JOIN production.stocks st ON s.BrandId = st.BrandId
+                INNER JOIN production.products p ON st.ProductId = p.ProductId
+                INNER JOIN production.categories c ON p.CategoryId = c.CategoryId;";
 
             var storeMap = new Dictionary<int, Brand>();
 
