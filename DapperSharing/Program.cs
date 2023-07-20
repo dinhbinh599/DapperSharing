@@ -29,7 +29,7 @@ namespace DapperSharing
                         await E03_MappingConfig.Run();
                         break;
                     case "4":
-                        await E04_ExecuteCommand.Run();
+                        await E04_ExecuteNonQueryCommand.Run();
                         break;
                     case "5":
                         await E05_ExecuteReader.Run();
