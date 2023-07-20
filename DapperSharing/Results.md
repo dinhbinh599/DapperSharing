@@ -11,6 +11,6 @@
 |                     Method |      Mean   |    Error |    StdDev |   Gen0 |   Gen1 | Allocated |
 |--------------------------- |------------:|---------:|----------:|-------:|-------:|----------:|
 | Dapper_QueryFirstOrDefault |    42.56 us | 0.751 us |  1.053 us | 0.4272 |      - |   3.98 KB |
-|              Dapper_Filter |   90.99 us  | 2.319 us |  2.277 us | 9.2773 | 1.2207 |  36.04 KB |
+|              Dapper_Filter |    90.99 us | 2.319 us |  2.277 us | 9.2773 | 1.2207 |  36.04 KB |
 |          Dapper_Add_Delete | 2,027.34 us | 6.578 us | 18.768 us |      - |      - |  10.95 KB |
 

@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using DapperSharing.Models;
-using DapperSharing.Models.TableValue;
 using DapperSharing.Utils;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -33,12 +32,15 @@ namespace DapperSharing.Examples
                         await StringParameters(connection);
                         break;
                     case "5":
-                        await WhereInParameters(connection);
+                        await LiteralReplacements(connection);
                         break;
                     case "6":
-                        await OutputParameters(connection);
+                        await WhereInParameters(connection);
                         break;
                     case "7":
+                        await OutputParameters(connection);
+                        break;
+                    case "8":
                         await TableValuedParameters(connection);
                         break;
                 }
@@ -122,6 +124,19 @@ WHERE ProductName LIKE @NameContains
             DisplayHelper.PrintJson(firstProduct);
         }
 
+        static async Task LiteralReplacements(IDbConnection connection)
+        {
+            string sql = @"SELECT * FROM production.products WHERE ProductId = {=productId}";
+
+            var products = await connection.QueryAsync<Product>(sql,
+                new
+                {
+                    productId = 2
+                });
+
+            DisplayHelper.PrintJson(products);
+        }
+        
         static async Task WhereInParameters(IDbConnection connection)
         {
             string sql = @"SELECT * FROM production.products WHERE ProductId IN @Ids";
