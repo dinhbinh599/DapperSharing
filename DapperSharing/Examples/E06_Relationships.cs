@@ -2,6 +2,7 @@
 using DapperSharing.Models;
 using DapperSharing.Utils;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace DapperSharing.Examples
@@ -28,6 +29,12 @@ namespace DapperSharing.Examples
                     case "3":
                         await QueryMultipleRelationships(connection);
                         break;
+                    case "4":
+                        await QueryOneToManyEFCore();
+                        break;
+                    case "5":
+                        await QueryOneToManyDapperBasic(connection);
+                        break;
                 }
             }
         }
@@ -35,20 +42,25 @@ namespace DapperSharing.Examples
         static async Task QueryOneToMany(IDbConnection connection)
         {
             var sql = @"
-                SELECT 
-                    p.ProductId, 
-                    p.ProductName,
-                    c.CategoryId,
-                    c.CategoryName
+                SELECT p.ProductId, p.ProductName, c.CategoryId, c.CategoryName
                 FROM production.products p
                 INNER JOIN production.categories c ON p.CategoryId = c.CategoryId
                 WHERE ProductId = 1";
 
-            var result = await connection.QueryAsync<Product, Category, Product>(sql,
+            var result = await connection.QueryAsync<Product, Category, ProductCategory>(sql,
                 (product, category) =>
                 {
-                    product.Category = category;
-                    return product;
+                    var productCategory = new ProductCategory
+                    {
+                        ProductId = product.ProductId,
+                        ProductName = product.ProductName,
+                        Category = new CategoryModel
+                        {
+                            CategoryId = category.CategoryId,
+                            CategoryName = category.CategoryName,
+                        }
+                    };
+                    return productCategory;
                 }, splitOn: "CategoryId");
 
             DisplayHelper.PrintJson(result);
@@ -116,6 +128,59 @@ namespace DapperSharing.Examples
                 }, splitOn: "ProductId,CategoryId");
 
             DisplayHelper.PrintJson(storeMap.Values);
+        }
+
+        static async Task QueryOneToManyEFCore()
+        {
+            var connection = new BikeStoresContext(
+                Program.DBInfo.ConnectionString);
+            var result = await connection.Products
+                .Where(x => x.ProductId == 1)
+                .Include(x => x.Category)
+                .Select(x => new ProductCategory
+                {
+                    ProductId = x.ProductId,
+                    ProductName = x.ProductName,
+                    Category = new CategoryModel
+                    {
+                        CategoryId = x.CategoryId,
+                        CategoryName = x.Category.CategoryName,
+                    }
+                })
+                .FirstOrDefaultAsync();
+
+            DisplayHelper.PrintJson(result);
+        }
+
+        static async Task QueryOneToManyDapperBasic(IDbConnection connection)
+        {
+            var sql = @"
+                SELECT p.ProductId, p.ProductName FROM production.products p
+		        WHERE ProductId = 1
+
+	            SELECT c.CategoryId, c.CategoryName FROM production.categories c
+		        WHERE CategoryId = (SELECT p.CategoryId
+			        FROM production.products p
+			        WHERE ProductId = 1)";
+
+            var result = await connection.QueryMultipleAsync(sql);
+            var product = result.ReadFirstOrDefault<ProductCategory>();
+            product.Category = result.ReadFirstOrDefault<CategoryModel>();
+
+            DisplayHelper.PrintJson(product);
+        }
+
+        private class ProductCategory
+        {
+            public int ProductId { get; set; }
+            public string ProductName { get; set; }
+            public CategoryModel Category { get; set; }
+
+        }
+        private class CategoryModel
+        {
+            public int CategoryId { get; set; }
+            public string CategoryName { get; set; }
         }
     }
 }

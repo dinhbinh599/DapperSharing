@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Dapper.Contrib.Extensions;
 using DapperSharing.Models;
 using DapperSharing.Utils;
 using Microsoft.Data.SqlClient;
@@ -12,11 +13,40 @@ namespace DapperSharing.Examples
         {
             Console.WriteLine("=========== RUNNING E09_Extensions ===========");
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+            DisplayHelper.PrintListOfMethods(typeof(E09_Extensions));
 
+            var userInput = Console.ReadLine();
             using (var connection = new SqlConnection(Program.DBInfo.ConnectionString))
             {
-                await SqlBuilder(connection);
+                switch (userInput)
+                {
+                    case "1":
+                        await Contrib(connection);
+                        break;
+                    case "2":
+                        await SqlBuilder(connection);
+                        break;
+                }
             }
+        }
+
+        static async Task Contrib(IDbConnection connection)
+        {
+            var product = new Product
+            {
+                BrandId = 1,
+                CategoryId = 1,
+                ListPrice = 150,
+                ModelYear = 2023,
+                ProductName = "My 2023 Product"
+            };
+            var id = await connection.InsertAsync(product);
+
+            product = await connection.GetAsync<Product>(id);
+            product.ProductName = "My 2023 Product updated";
+
+            await connection.UpdateAsync(product);
+            await connection.DeleteAsync(new Product { ProductId = id });
         }
 
         static async Task SqlBuilder(IDbConnection connection)
@@ -69,12 +99,12 @@ namespace DapperSharing.Examples
             }
 
             var template = builder.AddTemplate(@$"
-SELECT
-    /**select**/ 
-FROM production.products AS p
-    /**innerjoin**/
-    /**where**/ 
-    /**orderby**/");
+                SELECT
+                    /**select**/ 
+                FROM production.products AS p
+                    /**innerjoin**/
+                    /**where**/ 
+                    /**orderby**/");
 
             var categoryIdx = types.IndexOf(typeof(Category));
             var products = await connection.QueryAsync(template.RawSql, types: types.ToArray(), map: (data) =>

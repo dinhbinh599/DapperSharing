@@ -30,7 +30,7 @@ namespace DapperSharing.Examples
             }
         }
 
-        static async Task<int> Insert(IDbConnection connection)
+        static async Task Insert(IDbConnection connection)
         {
             var sql = @"
                 INSERT INTO production.products
@@ -47,67 +47,37 @@ namespace DapperSharing.Examples
                 ProductName = "My 2023 Product"
             });
             Console.WriteLine($"Affected rows: {count}");
-
-            var id = await connection.ExecuteScalarAsync<int>(@"
-                SELECT ProductId from production.products
-                ORDER BY ProductId DESC");
-
-            Console.WriteLine($"New product ID: {id}");
-
-            return id;
         }
 
         static async Task Update(IDbConnection connection)
         {
-            Console.Write("Update product id: ");
-            int id = int.Parse(Console.ReadLine());
-            var sql = @"
-                UPDATE production.products 
-                SET ProductName = @ProductName, ModelYear = @ModelYear
-                WHERE ProductId = @ProductId;";
+            var sql = @"UPDATE production.products 
+                        SET ProductName = @ProductName
+                        WHERE ProductId = @ProductId;";
 
             var count = await connection.ExecuteAsync(sql, new
             {
-                ProductId = id,
-                ProductName = "My new product 2023 has been updated",
-                ModelYear = 2023
+                ProductId = 313,
+                ProductName = "My new product 2023 has been updated"
             });
-
             Console.WriteLine($"Affected rows: {count}");
-
-            var sq1l = @"SELECT * FROM production.products
-                        WHERE ProductId = " + id;
-
-            var entity = connection.QueryFirst<Product>(sq1l);
-            DisplayHelper.PrintJson(entity);
         }
 
         static async Task MultipleCommands(IDbConnection connection)
         {
-            var sql = @"
-                UPDATE production.products 
-                SET ProductName = ''
-                WHERE ModelYear = @ModelYear;
+            var sql = @"UPDATE production.products 
+                        SET ProductName = ''
+                        WHERE ModelYear = @ModelYear;
 
-                DELETE FROM production.products
-                WHERE ProductId = @Id;";
+                        DELETE FROM production.products
+                        WHERE ProductId = @Id;";
 
-            Console.Write("Delete product id: ");
-            int id = int.Parse(Console.ReadLine());
             var count = await connection.ExecuteAsync(sql, new
             {
                 ModelYear = 2023,
-                Id = id
+                Id = 313
             });
-
             Console.WriteLine($"Affected rows: {count}");
-
-            Console.WriteLine($"Products in 2023:");
-            var sq1l = @"SELECT * FROM production.products
-                        WHERE ModelYear = 2023";
-
-            var entity = connection.Query<Product>(sq1l);
-            DisplayHelper.PrintJson(entity);
         }
     }
 }
