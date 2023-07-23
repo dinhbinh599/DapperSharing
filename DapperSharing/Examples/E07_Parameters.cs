@@ -43,6 +43,9 @@ namespace DapperSharing.Examples
                     case "8":
                         await TableValuedParameters(connection);
                         break;
+                    case "9":
+                        await ParameterSniffing(connection);
+                        break;
                 }
             }
         }
@@ -110,8 +113,8 @@ WHERE ProductName LIKE @NameContains
             var dbParams = new DbString()
             {
                 Value = "%Trek %",
-                IsAnsi = true,
-                IsFixedLength = true,
+                IsAnsi = true,  // 'n(var)char' or '(var)char'
+                IsFixedLength = false, // 'char' or 'varchar'
                 Length = 7
             };
 
@@ -179,7 +182,7 @@ AS
             var name = parameters.Get<string>("@Name");
             var modelYear = parameters.Get<short>("@ModelYear");
 
-            Console.WriteLine($"{name} - {modelYear}");
+            DisplayHelper.PrintJson($"{name} - {modelYear}");
         }
 
         static async Task TableValuedParameters(IDbConnection connection)
@@ -194,6 +197,21 @@ AS
             var p = new DynamicParameters();
             p.Add("TvpExampleType", tvpExampleType.AsTableValuedParameter("dbo.TvpExampleType"));
             await connection.ExecuteAsync("dbo.MyStoredProc", p, commandType: CommandType.StoredProcedure);
+        }
+
+        static async Task ParameterSniffing(IDbConnection connection)
+        {
+
+            var sql = @"
+SELECT ListPrice FROM production.products 
+WHERE ListPrice >= @Year";
+
+            var products = await connection.QueryAsync<Product>(sql, new
+            {
+                Year = 1
+            });
+
+            DisplayHelper.PrintJson(products);
         }
     }
 }
