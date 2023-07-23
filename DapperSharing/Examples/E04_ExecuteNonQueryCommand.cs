@@ -57,7 +57,7 @@ namespace DapperSharing.Examples
 
             var count = await connection.ExecuteAsync(sql, new
             {
-                ProductId = 313,
+                ProductId = 336,
                 ProductName = "My new product 2023 has been updated"
             });
             Console.WriteLine($"Affected rows: {count}");
@@ -75,7 +75,7 @@ namespace DapperSharing.Examples
             var count = await connection.ExecuteAsync(sql, new
             {
                 ModelYear = 2023,
-                Id = 313
+                Id = 336
             });
             Console.WriteLine($"Affected rows: {count}");
         }
