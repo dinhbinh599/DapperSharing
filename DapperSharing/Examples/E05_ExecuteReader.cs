@@ -1,5 +1,7 @@
 ﻿using Dapper;
+using DapperSharing.Models;
 using Microsoft.Data.SqlClient;
+using Perfolizer.Mathematics.SignificanceTesting;
 using System.Data;
 
 namespace DapperSharing.Examples
@@ -20,9 +22,34 @@ namespace DapperSharing.Examples
             var sql = @"SELECT * FROM production.products";
 
             var dataReader = await connection.ExecuteReaderAsync(sql);
+            var products = new List<Product>();
 
-            var datatable = new DataTable();
+            DataTable datatable = new();
             datatable.Load(dataReader);
+
+            for (int i = 0; i < datatable.Rows.Count; i++)
+            {
+                Product product = new()
+                {
+                    ProductId = Convert.ToInt32(datatable.Rows[i]["ProductId"]),
+                    ProductName = datatable.Rows[i]["ProductName"].ToString(),
+                    ModelYear = Convert.ToInt16(datatable.Rows[i]["ModelYear"]),
+                    ListPrice = Convert.ToDecimal(datatable.Rows[i]["ListPrice"])
+                };
+                products.Add(product);
+            }
+
+            while (dataReader.Read())
+            {
+                Product product = new()
+                {
+                    ProductId = dataReader.GetInt32(0),
+                    ProductName = dataReader.GetString(1),
+                    ModelYear = dataReader.GetInt16(5),
+                    ListPrice = dataReader.GetDecimal(6),
+                };
+                products.Add(product);
+            }
         }
     }
 }

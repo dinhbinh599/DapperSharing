@@ -43,9 +43,12 @@ namespace DapperSharing.Examples
 
         static async Task QueryDefault(IDbConnection connection)
         {
-            var sql = @"SELECT ProductId AS product_id FROM production.products";
+            var sql = @"SELECT ProductId AS product_id 
+                        FROM production.products
+                        WHERE ProductId = 1";
 
-            var products = await connection.QueryAsync<DefaultProductModel>(sql);
+            var products = await connection
+                .QueryAsync<DefaultProductModel>(sql);
 
             DisplayHelper.PrintJson(products);
         }
@@ -61,11 +64,12 @@ namespace DapperSharing.Examples
         {
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
-            var sql = @"SELECT ProductId AS product_id FROM production.products";
+            var sql = @"SELECT ProductId AS product_id 
+                        FROM production.products
+                        WHERE ProductId = 1";
 
-            var products = await connection.QueryAsync<MatchingUnderscoresProductModel>(sql);
-
-            //Dapper.DefaultTypeMap.MatchNamesWithUnderscores = false;
+            var products = await connection
+                .QueryAsync<MatchingUnderscoresProductModel>(sql);
 
             DisplayHelper.PrintJson(products);
         }
@@ -86,9 +90,7 @@ namespace DapperSharing.Examples
                 (type, columnName) =>
                 {
                     if (columnName == "ProductId")
-                    {
                         return type.GetProperty(nameof(CustomMappingProductModel.CustomProductId));
-                    }
 
                     return null;
                 }
@@ -96,7 +98,8 @@ namespace DapperSharing.Examples
 
             Dapper.SqlMapper.SetTypeMap(typeof(CustomMappingProductModel), customMap);
 
-            var sql = @"SELECT * FROM production.products";
+            var sql = @"SELECT * FROM production.products
+                        WHERE ProductId = 1";
 
             var products = await connection.QueryAsync<CustomMappingProductModel>(sql);
 
