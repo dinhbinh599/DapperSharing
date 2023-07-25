@@ -40,26 +40,22 @@ namespace DapperSharing.Examples
                 ModelYear = 2023,
                 ProductName = "My 2023 Product"
             };
-            var id = await connection.InsertAsync(product);
+            var productIdContrib = await connection.InsertAsync(product);
+            Console.WriteLine("Product Id by Dapper.Contrib: " + productIdContrib);
 
-            product = await connection.GetAsync<Product>(id);
-            product.ProductName = "My 2023 Product updated";
+            var rawSql = @"
+                INSERT INTO production.products
+                    (ProductName, BrandId, CategoryId, ModelYear, ListPrice)
+                VALUES 
+                    (@ProductName, @BrandId, @CategoryId, @ModelYear, @ListPrice);
+                SELECT SCOPE_IDENTITY()";
 
-            await connection.UpdateAsync(product);
-            await connection.DeleteAsync(new Product { ProductId = id });
+            var productIdNormal = await connection.ExecuteScalarAsync(rawSql, product);
+            Console.WriteLine("Product Id by Dapper Normal: " + productIdNormal);
         }
 
         static async Task SqlBuilder(IDbConnection connection)
         {
-            var builder = new SqlBuilder()
-                .Select("p.*")
-                .OrderBy("p.ModelYear DESC, p.ProductName ASC");
-            var types = new List<Type>
-            {
-                typeof(Product)
-            };
-            var splitOns = new List<string>();
-
             Console.Write("Input search: ");
             var search = Console.ReadLine();
 
@@ -68,6 +64,43 @@ namespace DapperSharing.Examples
 
             Console.Write("Input model year: ");
             int.TryParse(Console.ReadLine(), out var modelYear);
+
+            #region Raw SQL
+            var sql = "SELECT TOP 10 * FROM production.products AS p";
+            var dynamicParameters = new DynamicParameters();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                dynamicParameters.AddDynamicParams(new { Search = $"%{search}%" });
+                sql += "\nWHERE p.ProductName LIKE @Search";
+            }
+
+            if (modelYear > 0)
+            {
+                dynamicParameters.AddDynamicParams(new { Year = modelYear });
+
+                if (sql.Contains("WHERE"))
+                {
+                    sql += "\nAND p.ModelYear = @Year";
+                }
+                else
+                {
+                    sql += "\nWHERE p.ModelYear = @Year";
+                }
+            }
+
+            var entity = connection.Query<Product>(sql, dynamicParameters);
+            #endregion
+            #region SqlBuilder
+
+            var builder = new SqlBuilder()
+                .Select("p.*")
+                .OrderBy("p.ModelYear DESC, p.ProductName ASC");
+            var types = new List<Type>
+            {
+                typeof(Product)
+            };
+            var splitOns = new List<string>();
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -120,6 +153,7 @@ namespace DapperSharing.Examples
                 return product;
             }, param: template.Parameters, splitOn: string.Join(',', splitOns));
 
+            #endregion
             DisplayHelper.PrintJson(products);
         }
     }
