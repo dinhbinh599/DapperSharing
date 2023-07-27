@@ -4,6 +4,7 @@ using DapperSharing.Models;
 using DapperSharing.Utils;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using Z.Dapper.Plus;
 
 namespace DapperSharing.Examples
 {
@@ -25,6 +26,9 @@ namespace DapperSharing.Examples
                         break;
                     case "2":
                         await SqlBuilder(connection);
+                        break;
+                    case "3":
+                        await DapperPlus(connection);
                         break;
                 }
             }
@@ -91,6 +95,7 @@ namespace DapperSharing.Examples
 
             var entity = connection.Query<Product>(sql, dynamicParameters);
             #endregion
+
             #region SqlBuilder
 
             var builder = new SqlBuilder()
@@ -155,6 +160,32 @@ namespace DapperSharing.Examples
 
             #endregion
             DisplayHelper.PrintJson(products);
+        }
+
+        static async Task DapperPlus(IDbConnection connection)
+        {
+            var sql = @"SELECT TOP 13 * FROM production.products
+                        ORDER BY ProductId DESC";
+            var products = connection.Query<Product>(sql)
+                .Select(x => new Product
+                {
+                    BrandId = x.BrandId,
+                    CategoryId = x.CategoryId,
+                    ListPrice = x.ListPrice + 5,
+                    ModelYear = x.ModelYear,
+                    ProductName = x.ProductName + "_DapperPlus"
+                });
+
+            var sqlInsert = @"
+                INSERT INTO production.products
+                    (ProductName, BrandId, CategoryId, ModelYear, ListPrice)
+                VALUES 
+                    (@ProductName, @BrandId, @CategoryId, @ModelYear, @ListPrice);";
+
+            var resultNormal = connection.Execute(sqlInsert, products);
+
+            var result = connection.BulkInsert(products);
+            IEnumerable<Product> productInserted = result.Current;
         }
     }
 }

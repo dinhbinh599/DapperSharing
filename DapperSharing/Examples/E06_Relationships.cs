@@ -47,20 +47,11 @@ namespace DapperSharing.Examples
                 INNER JOIN production.categories c ON p.CategoryId = c.CategoryId
                 WHERE ProductId = 1";
 
-            var result = await connection.QueryAsync<Product, Category, ProductCategory>(sql,
+            var result = await connection.QueryAsync<Product, Category, Product>(sql,
                 (product, category) =>
                 {
-                    var productCategory = new ProductCategory
-                    {
-                        ProductId = product.ProductId,
-                        ProductName = product.ProductName,
-                        Category = new CategoryModel
-                        {
-                            CategoryId = category.CategoryId,
-                            CategoryName = category.CategoryName,
-                        }
-                    };
-                    return productCategory;
+                    product.Category = category;
+                    return product;
                 }, splitOn: "CategoryId");
 
             DisplayHelper.PrintJson(result);
@@ -134,19 +125,10 @@ namespace DapperSharing.Examples
         {
             var connection = new BikeStoresContext(
                 Program.DBInfo.ConnectionString);
+
             var result = await connection.Products
                 .Where(x => x.ProductId == 1)
                 .Include(x => x.Category)
-                .Select(x => new ProductCategory
-                {
-                    ProductId = x.ProductId,
-                    ProductName = x.ProductName,
-                    Category = new CategoryModel
-                    {
-                        CategoryId = x.CategoryId,
-                        CategoryName = x.Category.CategoryName,
-                    }
-                })
                 .FirstOrDefaultAsync();
 
             DisplayHelper.PrintJson(result);
@@ -164,23 +146,10 @@ namespace DapperSharing.Examples
 			        WHERE ProductId = 1)";
 
             var result = await connection.QueryMultipleAsync(sql);
-            var product = result.ReadFirstOrDefault<ProductCategory>();
-            product.Category = result.ReadFirstOrDefault<CategoryModel>();
+            var product = result.ReadFirstOrDefault<Product>();
+            product.Category = result.ReadFirstOrDefault<Category>();
 
             DisplayHelper.PrintJson(product);
-        }
-
-        private class ProductCategory
-        {
-            public int ProductId { get; set; }
-            public string ProductName { get; set; }
-            public CategoryModel Category { get; set; }
-
-        }
-        private class CategoryModel
-        {
-            public int CategoryId { get; set; }
-            public string CategoryName { get; set; }
         }
     }
 }
