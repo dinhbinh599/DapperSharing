@@ -131,7 +131,7 @@ namespace DapperSharing.Examples
                 .Include(x => x.Category)
                 .FirstOrDefaultAsync();
 
-            DisplayHelper.PrintJson(result);
+            DisplayHelper.PrintJsonWithoutLoop(result);
         }
 
         static async Task QueryOneToManyDapperBasic(IDbConnection connection)

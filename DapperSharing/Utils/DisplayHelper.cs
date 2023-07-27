@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -17,6 +18,15 @@ namespace DapperSharing.Utils
             Console.WriteLine(JsonSerializer.Serialize(value, new JsonSerializerOptions
             {
                 WriteIndented = true
+            }));
+        }
+
+        public static void PrintJsonWithoutLoop(object value)
+        {
+            Console.WriteLine(JsonSerializer.Serialize(value, new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles
             }));
         }
         public static void PrintListOfMethods(Type classType)
